@@ -18,27 +18,38 @@ namespace FraggedEmpireGenerator
 
         public void Append(List<Creature> creatures)
         {
-            var table = new List<(string Name, string Hit, string Def, string Actions)>();
+            var table = new List<(string Name, string Hit, string Def, string Mobility, string Actions)>();
 
-            foreach(var creature in creatures)
+            foreach(var c in creatures)
             {
                 table.Add
                 (
                     new 
                     (
-                        "Critter", 
-                        "3d6 (3 Endure, 1 Crit)", 
-                        "10 (12 Durability, 2 Armour)",
-                        "1"
+                        $"{c.Name}", 
+                        $"{c.HitDice}d6 + {c.HitBonus} ({c.HitDmgEndurance} Endure, {c.HitDmgCritical} Crit, {c.HitRange} Range)", 
+                        $"{c.DefArmour} ({c.DefEndurance} Endureance, {c.DefArmour} Armour, {c.DefDurability} Durability)",
+                        $"{c.Mobility}",
+                        $"{c.Actions}"
                     )
                 );
             }
 
-            _builder.AppendLine("Name | Hit | Def | Actions");
+            _builder.AppendLine("| Name | Hit | Def | Mobility | Actions |");
+            _builder.AppendLine("| ---- | --- | --- | -------- | ------- |");
             foreach (var row in table)
             {
-                _builder.AppendLine($"{row.Name} | {row.Hit} | {row.Def} | {row.Actions}");
+                _builder.AppendLine($"| {row.Name} | {row.Hit} | {row.Def} | {row.Mobility} | {row.Actions} |");
             }
+
+            _builder.AppendLine();
+            foreach(var trait in creatures.SelectMany(c => c.Traits).DistinctBy(t => t.Name))
+            {
+                _builder.AppendLine($"{trait.Name}\n: {trait.Desc.Replace("\n", "\n: ")}");
+                _builder.AppendLine();
+            }
+            _builder.AppendLine();
+
         }
 
         public void Clear()

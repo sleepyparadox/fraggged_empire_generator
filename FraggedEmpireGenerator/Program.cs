@@ -2,12 +2,7 @@
 using FraggedEmpireGenerator;
 using Newtonsoft.Json;
 
-Console.WriteLine("test");
 
-var creater = new Creature();
-Console.WriteLine(JsonConvert.SerializeObject(creater));
-
-Console.WriteLine("Creatures");
 
 var encounter = EncounterGenerator.CreateEncounter(NPCType.HenchmenGroup);
 

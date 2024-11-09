@@ -14,10 +14,21 @@ namespace FraggedEmpireGenerator
 
     public class Creature
     {
-        public string GroupAttackId;
+        public string GroupId;
         public List<Trait> Traits = new List<Trait>();
 
-        public int BaseToHit;
+        public string Name = "Critter";
+        public int HitBonus = 2;
+        public int HitDice = 3;
+        public int HitDmgEndurance = 3;
+        public int HitDmgCritical = 3;
+        public int HitRange = 3;
+        public int DefBase = 10;
+        public int DefEndurance = 20;
+        public int DefDurability = 1;
+        public int DefArmour = 2;
+        public int Mobility = 5;
+        public int Actions = 1;
 
         public Creature DeepCopy()
         {
@@ -51,9 +62,10 @@ namespace FraggedEmpireGenerator
             public static readonly Trait HechmenDamage = new Trait("Hechmen Damage", "Each Attacking Body grants +1d6 Hit and +1 End Dmg");
             public static readonly Trait HechmenLackInitiative = new Trait("Hechmen Lack Initiative", "Always acts last in combat");
             public static readonly Trait HechmenSharedEndurance = new Trait("Hechmen Shared Endurance", "Hechmen share endurance pool");
+            public static readonly Trait HechmenBodies = new Trait("Shared Bodies", "Each attacking body adds +1d6 Hit and +1 End Dmg");
             public static readonly Trait HechmenSharedAction = new Trait("Hechmen Shared Action", "Hechmen share 1 action per turn");
-            public static readonly Trait NPCMunitions1 = new Trait("NPC Munitions (1)", "1 Munitions per turn per weapon. Modifiers (reload / disrupt) only apply to current or next turn");
-            public static readonly Trait NPCMunitions2 = new Trait("NPC Munitions (2)", "2 Munitions per turn per weapon. Modifiers (reload / disrupt) only apply to current or next turn");
+            public static readonly Trait NPCMunitions1 = new Trait("NPC Munitions (1)", "1 Munitions per turn per weapon.\nModifiers (reload / disrupt) only apply to current or next turn.\nReload +2M");
+            public static readonly Trait NPCMunitions2 = new Trait("NPC Munitions (2)", "2 Munitions per turn per weapon.\nModifiers (reload / disrupt) only apply to current or next turn.\nReload +2M");
         }
     }
 
@@ -65,17 +77,30 @@ namespace FraggedEmpireGenerator
             if (npcType == NPCType.HenchmenGroup)
             {
                 var henchman = new Creature();
-                henchman.GroupAttackId = "HenchmentGroup";
+                henchman.GroupId = "HenchmentGroup";
                 henchman.Traits.Add(Traits.NPCType.HechmenDamage);
-                henchman.Traits.Add(Traits.NPCType.HechmenDamage);
-                henchman.Traits.Add(Traits.NPCType.HechmenDamage);
-                henchman.Traits.Add(Traits.NPCType.HechmenDamage);
-                henchman.BaseToHit = 2;
+                henchman.Traits.Add(Traits.NPCType.HechmenLackInitiative);
+                henchman.Traits.Add(Traits.NPCType.HechmenSharedEndurance);
+                henchman.Traits.Add(Traits.NPCType.HechmenSharedAction);
+                henchman.Traits.Add(Traits.NPCType.HechmenBodies);
+                henchman.Traits.Add(Traits.NPCType.NPCMunitions1);
+                henchman.HitBonus = 2;
+
+                var statRow = EncounterTables.HenchmenGroup.Any(r => r.PowerHiKey <= powerLevel)
+                            ? EncounterTables.HenchmenGroup.First(r => r.PowerHiKey <= powerLevel)
+                            : EncounterTables.HenchmenGroup.Last();
+                henchman.DefBase = statRow.Defence;
+                henchman.DefArmour = statRow.Armour;
+                henchman.DefDurability = statRow.Durability;
+                henchman.DefEndurance = statRow.Endurance;
+                henchman.Mobility = 5;
+                henchman.Actions = 1;
+
                 // generate weapon
                 // no outfit / utility
                 // no grit re-roll
 
-                for (int i = 0; i < (int)(partySize * 1.6); i++)
+                for (int i = 0; i < statRow.Bodies; i++)
                 {
                     var copy = henchman.DeepCopy();
                     encounter.Creatures.Add(copy);
@@ -117,19 +142,18 @@ namespace FraggedEmpireGenerator
         public int Endurance;
         public int Resources;
         public int Variations;
-        public int Actions;
     }
 
     public static class EncounterTables
     {
         public static List<EncounterTableStats> HenchmenGroup = new List<EncounterTableStats>()
         {
-            new EncounterTableStats() { PowerHiKey = 3, Defence = 12, Armour = 3, Durability = 1, Bodies = 5, Endurance = 20, Resources = 1, Variations = 1, Actions = 1 },
-            new EncounterTableStats() { PowerHiKey = 6, Defence = 13, Armour = 3, Durability = 1, Bodies = 6, Endurance = 22, Resources = 2, Variations = 1, Actions = 1 },
-            new EncounterTableStats() { PowerHiKey = 9, Defence = 13, Armour = 3, Durability = 1, Bodies = 7, Endurance = 24, Resources = 3, Variations = 2, Actions = 1 },
-            new EncounterTableStats() { PowerHiKey = 12, Defence = 14, Armour = 3, Durability = 1, Bodies = 8, Endurance = 26, Resources = 4, Variations = 2, Actions = 1 },
-            new EncounterTableStats() { PowerHiKey = 15, Defence = 14, Armour = 3, Durability = 1, Bodies = 9, Endurance = 28, Resources = 5, Variations = 3, Actions = 1 },
-            new EncounterTableStats() { PowerHiKey = 18, Defence = 15, Armour = 3, Durability = 1, Bodies = 10, Endurance = 30, Resources = 6, Variations = 3, Actions = 1 },
+            new EncounterTableStats() { PowerHiKey = 3, Defence = 12, Armour = 3, Durability = 1, Bodies = 5, Endurance = 20, Resources = 1, Variations = 1},
+            new EncounterTableStats() { PowerHiKey = 6, Defence = 13, Armour = 3, Durability = 1, Bodies = 6, Endurance = 22, Resources = 2, Variations = 1},
+            new EncounterTableStats() { PowerHiKey = 9, Defence = 13, Armour = 3, Durability = 1, Bodies = 7, Endurance = 24, Resources = 3, Variations = 2},
+            new EncounterTableStats() { PowerHiKey = 12, Defence = 14, Armour = 3, Durability = 1, Bodies = 8, Endurance = 26, Resources = 4, Variations = 2},
+            new EncounterTableStats() { PowerHiKey = 15, Defence = 14, Armour = 3, Durability = 1, Bodies = 9, Endurance = 28, Resources = 5, Variations = 3},
+            new EncounterTableStats() { PowerHiKey = 18, Defence = 15, Armour = 3, Durability = 1, Bodies = 10, Endurance = 30, Resources = 6, Variations = 3},
         };
     }
 }
