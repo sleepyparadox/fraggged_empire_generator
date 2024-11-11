@@ -67,7 +67,84 @@ namespace FraggedEmpireGenerator
             public static readonly Trait NPCMunitions1 = new Trait("NPC Munitions (1)", "1 Munitions per turn per weapon.\nModifiers (reload / disrupt) only apply to current or next turn.\nReload +2M");
             public static readonly Trait NPCMunitions2 = new Trait("NPC Munitions (2)", "2 Munitions per turn per weapon.\nModifiers (reload / disrupt) only apply to current or next turn.\nReload +2M");
         }
+        public static class WeaponType
+        {
+            public static readonly Trait StrongHit = new Trait("Strong Hit 5-6", "Strong hits are 5+");
+            public static readonly Trait HenchmanExtraCost1 = new Trait("Strong Henchman Extra Cost 1", "+1 Resource cost for Henchment NPCs");
+        }
     }
+
+    public class Weapon
+    {
+        public int SlotsUsed = 2;
+        public int HandsUsed = 2;
+        public int Range;
+        // select base, select 1 variation
+    }
+
+    [Flags]
+    public enum WeaponType
+    {
+        Gun,
+        Shell,
+        Companion ,
+        Melee,
+        Special,
+    }
+
+    public class BaseWeaponTableRow
+    {
+        public string Name;
+        public WeaponType WeaponType;
+        public int HitDice;
+        public int Hit;
+        public int Range;
+        public int EndDmg;
+        public int CritDmg;
+        public int AquireTime;
+        public int AquireEndurance;
+        public int CostResources;
+
+        public Trait[] Traits = new Trait[0];
+    }
+
+    public class WeaponGenerator
+    {
+    }
+
+    public static class WeaponTables
+    {
+        public static List<BaseWeaponTableRow> SmallArms = new List<BaseWeaponTableRow>()
+        {
+            new BaseWeaponTableRow() { Name = "Pistol", HitDice = 3, Hit = 1, Range = 3, EndDmg = 0, CritDmg = 3, WeaponType = WeaponType.Gun, AquireTime = 8, CostResources = 1 },
+            new BaseWeaponTableRow() { Name = "Submachine Gun (SMG)", HitDice = 4, Hit = 0, Range = 3, EndDmg = 1, CritDmg = 3, WeaponType = WeaponType.Gun, AquireTime = 12, CostResources = 2 },
+            new BaseWeaponTableRow() { Name = "Shotgun (Gun)", HitDice = 3, Hit = 2, Range = 2, EndDmg = 2, CritDmg = 3, WeaponType = WeaponType.Gun, AquireTime = 10, CostResources = 2 },
+            new BaseWeaponTableRow() { Name = "Shotgun (Shell)", HitDice = 3, Hit = 2, Range = 2, EndDmg = 2, CritDmg = 3, WeaponType = WeaponType.Shell, AquireTime = 10, CostResources = 2 },
+            new BaseWeaponTableRow() { Name = "Rifle", HitDice = 2, Hit = 2, Range = 6, EndDmg = 0, CritDmg = 4, WeaponType = WeaponType.Gun, AquireTime = 12, CostResources = 2, Traits = new []{ Traits.WeaponType.StrongHit, Traits.WeaponType.HenchmanExtraCost1 } },
+        };
+
+        public static List<BaseWeaponTableRow> Variations = new List<BaseWeaponTableRow>()
+        {
+            new BaseWeaponTableRow() { Name = "Particle", EndDmg = -1, AquireTime = -4  },
+            new BaseWeaponTableRow() { Name = "Metal Slugs / Barbs", Hit = -1, Range = -1, AquireTime = -2  },
+            new BaseWeaponTableRow() { Name = "Disruptor Pulse", Hit = 1, EndDmg = 1, CritDmg = -1, AquireTime = -1  },
+            new BaseWeaponTableRow() { Name = "Arc-Fire Bolts", Range = 1 },
+            new BaseWeaponTableRow() { Name = "Phase Beam", Hit = -2, Range = -1 },
+            new BaseWeaponTableRow() { Name = "Ion", Hit = 1, EndDmg = -1, AquireTime = 1 },
+        };
+
+        public static List<BaseWeaponTableRow> GunModifiers = new List<BaseWeaponTableRow>()
+        {
+            new BaseWeaponTableRow() { Name = "Personalised", Hit = 1, AquireTime = 10 },
+            new BaseWeaponTableRow() { Name = "Dual Wield", HitDice = 1, EndDmg = 1, AquireTime = 12, AquireEndurance = 1 },
+        };
+
+        public static List<BaseWeaponTableRow> ShellModifiers = new List<BaseWeaponTableRow>()
+        {
+            new BaseWeaponTableRow() { Name = "Shrapnel", EndDmg = 1, CritDmg = -1, AquireTime = -1 },
+        };
+    }
+
 
     public class EncounterGenerator
     {
@@ -132,7 +209,7 @@ namespace FraggedEmpireGenerator
         }
     }
 
-    public struct EncounterTableStats
+    public struct EncounterTableRow
     {
         public int PowerHiKey; // "Av PC 1-3 Res" = 3 
         public int Defence;
@@ -146,14 +223,14 @@ namespace FraggedEmpireGenerator
 
     public static class EncounterTables
     {
-        public static List<EncounterTableStats> HenchmenGroup = new List<EncounterTableStats>()
+        public static List<EncounterTableRow> HenchmenGroup = new List<EncounterTableRow>()
         {
-            new EncounterTableStats() { PowerHiKey = 3, Defence = 12, Armour = 3, Durability = 1, Bodies = 5, Endurance = 20, Resources = 1, Variations = 1},
-            new EncounterTableStats() { PowerHiKey = 6, Defence = 13, Armour = 3, Durability = 1, Bodies = 6, Endurance = 22, Resources = 2, Variations = 1},
-            new EncounterTableStats() { PowerHiKey = 9, Defence = 13, Armour = 3, Durability = 1, Bodies = 7, Endurance = 24, Resources = 3, Variations = 2},
-            new EncounterTableStats() { PowerHiKey = 12, Defence = 14, Armour = 3, Durability = 1, Bodies = 8, Endurance = 26, Resources = 4, Variations = 2},
-            new EncounterTableStats() { PowerHiKey = 15, Defence = 14, Armour = 3, Durability = 1, Bodies = 9, Endurance = 28, Resources = 5, Variations = 3},
-            new EncounterTableStats() { PowerHiKey = 18, Defence = 15, Armour = 3, Durability = 1, Bodies = 10, Endurance = 30, Resources = 6, Variations = 3},
+            new EncounterTableRow() { PowerHiKey = 3, Defence = 12, Armour = 3, Durability = 1, Bodies = 5, Endurance = 20, Resources = 1, Variations = 1},
+            new EncounterTableRow() { PowerHiKey = 6, Defence = 13, Armour = 3, Durability = 1, Bodies = 6, Endurance = 22, Resources = 2, Variations = 1},
+            new EncounterTableRow() { PowerHiKey = 9, Defence = 13, Armour = 3, Durability = 1, Bodies = 7, Endurance = 24, Resources = 3, Variations = 2},
+            new EncounterTableRow() { PowerHiKey = 12, Defence = 14, Armour = 3, Durability = 1, Bodies = 8, Endurance = 26, Resources = 4, Variations = 2},
+            new EncounterTableRow() { PowerHiKey = 15, Defence = 14, Armour = 3, Durability = 1, Bodies = 9, Endurance = 28, Resources = 5, Variations = 3},
+            new EncounterTableRow() { PowerHiKey = 18, Defence = 15, Armour = 3, Durability = 1, Bodies = 10, Endurance = 30, Resources = 6, Variations = 3},
         };
     }
 }
