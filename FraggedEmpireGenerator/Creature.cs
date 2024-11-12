@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FraggedEmpireGenerator.Definitions;
+using FraggedEmpireGenerator.Tables.Weapons;
 using Newtonsoft.Json;
 
 namespace FraggedEmpireGenerator
@@ -44,17 +46,6 @@ namespace FraggedEmpireGenerator
         Nemesis,
     }
 
-    public struct Trait
-    {
-        public string Name;
-        public string Desc;
-        public Trait(string name, string desc)
-        {
-            Name = name;
-            Desc = desc;
-        }
-    }
-
     public static class Traits
     {
         public static class NPCType
@@ -69,8 +60,7 @@ namespace FraggedEmpireGenerator
         }
         public static class WeaponType
         {
-            public static readonly Trait StrongHit = new Trait("Strong Hit 5-6", "Strong hits are 5+");
-            public static readonly Trait HenchmanExtraCost1 = new Trait("Strong Henchman Extra Cost 1", "+1 Resource cost for Henchment NPCs");
+           
         }
     }
 
@@ -80,16 +70,6 @@ namespace FraggedEmpireGenerator
         public int HandsUsed = 2;
         public int Range;
         // select base, select 1 variation
-    }
-
-    [Flags]
-    public enum WeaponType
-    {
-        Gun,
-        Shell,
-        Companion ,
-        Melee,
-        Special,
     }
 
     public class BaseWeaponTableRow
@@ -120,7 +100,7 @@ namespace FraggedEmpireGenerator
             new BaseWeaponTableRow() { Name = "Submachine Gun (SMG)", HitDice = 4, Hit = 0, Range = 3, EndDmg = 1, CritDmg = 3, WeaponType = WeaponType.Gun, AquireTime = 12, CostResources = 2 },
             new BaseWeaponTableRow() { Name = "Shotgun (Gun)", HitDice = 3, Hit = 2, Range = 2, EndDmg = 2, CritDmg = 3, WeaponType = WeaponType.Gun, AquireTime = 10, CostResources = 2 },
             new BaseWeaponTableRow() { Name = "Shotgun (Shell)", HitDice = 3, Hit = 2, Range = 2, EndDmg = 2, CritDmg = 3, WeaponType = WeaponType.Shell, AquireTime = 10, CostResources = 2 },
-            new BaseWeaponTableRow() { Name = "Rifle", HitDice = 2, Hit = 2, Range = 6, EndDmg = 0, CritDmg = 4, WeaponType = WeaponType.Gun, AquireTime = 12, CostResources = 2, Traits = new []{ Traits.WeaponType.StrongHit, Traits.WeaponType.HenchmanExtraCost1 } },
+            new BaseWeaponTableRow() { Name = "Rifle", HitDice = 2, Hit = 2, Range = 6, EndDmg = 0, CritDmg = 4, WeaponType = WeaponType.Gun, AquireTime = 12, CostResources = 2, Traits = new []{ WeaponTraits.StrongHit, WeaponTraits.HenchmanExtraCost1 } },
         };
 
         public static List<BaseWeaponTableRow> Variations = new List<BaseWeaponTableRow>()
